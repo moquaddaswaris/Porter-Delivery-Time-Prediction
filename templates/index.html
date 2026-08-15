@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Porter Delivery Predictor</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #222;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 650px;
+            padding: 35px;
+            background: white;
+            border-radius: 18px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header .icon {
+            font-size: 45px;
+            margin-bottom: 10px;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 30px;
+        }
+
+        .subtitle {
+            margin: 0;
+            color: #666;
+            font-size: 15px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            margin-bottom: 7px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 12px 13px;
+            border: 1px solid #d5d5d5;
+            border-radius: 9px;
+            outline: none;
+            font-size: 15px;
+            background: white;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #333;
+        }
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 14px;
+            border: none;
+            border-radius: 9px;
+            background: #222;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        button:hover {
+            background: #444;
+            transform: translateY(-1px);
+        }
+
+        .result {
+            margin-top: 25px;
+            padding: 22px;
+            text-align: center;
+            border-radius: 12px;
+            background: #eef6ff;
+        }
+
+        .result-title {
+            margin: 0 0 8px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .result-time {
+            margin: 0;
+            font-size: 30px;
+            font-weight: bold;
+        }
+
+        .error {
+            margin-top: 20px;
+            padding: 12px;
+            text-align: center;
+            color: #b00020;
+            background: #fff0f0;
+            border-radius: 8px;
+        }
+
+        .footer {
+            margin-top: 25px;
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 20px 0;
+            }
+
+            .container {
+                width: 94%;
+                padding: 25px 20px;
+            }
+
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .full-width {
+                grid-column: auto;
+            }
+
+            h1 {
+                font-size: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="icon">🚚</div>
+            <h1>Porter Delivery Predictor</h1>
+            <p class="subtitle">AI-powered delivery time estimation</p>
+        </div>
+
+        <form action="/predict" method="POST">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label for="market_id">Market ID</label>
+                    <input type="number" id="market_id" name="market_id" placeholder="e.g. 1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="order_protocol">Order Protocol</label>
+                    <input type="number" id="order_protocol" name="order_protocol" placeholder="e.g. 3" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="total_items">Number of Items</label>
+                    <input type="number" id="total_items" name="total_items" placeholder="e.g. 4" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="subtotal">Order Subtotal (₹)</label>
+                    <input type="number" id="subtotal" name="subtotal" placeholder="e.g. 450" min="0" step="0.01" required>
+                </div>
+
+                <div class="form-group full-width">
+                    <label for="store_primary_category">Store Category</label>
+                    <input type="text" id="store_primary_category" name="store_primary_category" placeholder="e.g. American" required>
+                </div>
+            </div>
+
+            <button type="submit">Predict Delivery Time</button>
+        </form>
+
+        {% if prediction %}
+            <div class="result">
+                <p class="result-title">Estimated Delivery Time</p>
+                <p class="result-time">{{ prediction }} minutes</p>
+            </div>
+        {% endif %}
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% endif %}
+
+        <div class="footer">Neural Network Regression Model</div>
+    </div>
+</body>
+</html>
